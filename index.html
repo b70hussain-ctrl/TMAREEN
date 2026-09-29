@@ -2,495 +2,856 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#1a1a2e">
-    <title>Health & Fitness Tracker | متتبع الصحة</title>
+    <meta name="apple-mobile-web-app-title" content="فيتنس وتغذية">
+    <meta name="theme-color" content="#0d1117">
+    <title>تتبّع اللياقة والتغذية</title>
     <style>
+        :root {
+            --bg-main: #0d1117;
+            --bg-card: #161b22;
+            --bg-input: #21262d;
+            --primary: #58a6ff;
+            --accent: #238636;
+            --danger: #da3633;
+            --warning: #d29922;
+            --text-main: #f0f6fc;
+            --text-sub: #8b949e;
+            --border: #30363d;
+            --c-cal: #58a6ff;
+            --c-pro: #f778ba;
+            --c-carb: #7ee787;
+            --c-fat: #d29922;
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #667eea;
-            --primary-dark: #5568d3;
-            --secondary: #764ba2;
-            --bg-dark: #0f0f1e;
-            --bg-card: #1a1a2e;
-            --bg-input: #242442;
-            --text-primary: #e0e0e0;
-            --text-secondary: #a0a0a0;
-            --border: #2a2a4e;
-            --success: #51cf66;
-            --danger: #ff6b6b;
-            --warning: #ffd43b;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cairo", sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', 'Tahoma', 'Cairo', sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            overflow: hidden;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
         }
 
-        .app-container {
+        .mobile-container {
             width: 100%;
-            max-width: 500px;
-            height: 100vh;
-            margin: 0 auto;
+            max-width: 480px;
             display: flex;
             flex-direction: column;
-            background: var(--bg-dark);
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            height: 100vh;
+            position: relative;
+            background-color: var(--bg-main);
         }
 
-        /* ===== Header ===== */
-        .header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            padding: 20px;
+        header {
+            padding: 16px;
             text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            border-bottom: 1px solid var(--border);
+            background-color: rgba(22, 27, 34, 0.85);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .header .sub-text {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-top: 5px;
+        header h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
         }
 
-        /* ===== Content Area ===== */
         .content {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
-            margin-bottom: 80px;
-            scroll-behavior: smooth;
+            padding: 16px;
+            padding-bottom: 95px;
         }
 
-        .tab-content {
+        .tab-view {
             display: none;
-            animation: fadeIn 0.4s ease;
         }
 
-        .tab-content.active {
+        .tab-view.active {
             display: block;
+            animation: fadeIn 0.25s ease-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ===== Scrollbar ===== */
-        .content::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .content::-webkit-scrollbar-track {
-            background: var(--bg-input);
-        }
-
-        .content::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 3px;
-        }
-
-        /* ===== TAB 1: السعرات ===== */
-        .calories-section {
+        /* دوائر السعرات والماكروز */
+        .circle-dashboard {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 25px;
+            gap: 18px;
+            margin-bottom: 20px;
         }
 
-        .progress-circle-container {
+        .main-ring {
             position: relative;
-            width: 220px;
-            height: 220px;
+            width: 190px;
+            height: 190px;
+        }
+
+        .main-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .main-ring-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .main-ring-center .value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--c-cal);
+        }
+
+        .main-ring-center .label {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+
+        .main-ring-center .target {
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            margin-top: 2px;
+        }
+
+        .mini-macros-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+        }
+
+        .macro-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mini-ring {
+            position: relative;
+            width: 58px;
+            height: 58px;
+        }
+
+        .mini-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .mini-ring-center {
+            position: absolute;
+            inset: 0;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
         }
 
-        .progress-circle {
-            position: relative;
-            width: 100%;
-            height: 100%;
+        .macro-card .name {
+            font-size: 0.78rem;
+            color: var(--text-sub);
         }
 
-        .circle-background {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: var(--bg-card);
-            box-shadow: inset 0 4px 15px rgba(0, 0, 0, 0.3), 0 4px 15px rgba(102, 126, 234, 0.1);
+        .macro-card .val {
+            font-size: 0.72rem;
+            color: var(--text-main);
         }
 
-        .circle-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 2;
+        /* كروت الإدخال */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
         }
 
-        .circle-text .number {
-            font-size: 48px;
-            font-weight: 900;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: block;
-            line-height: 1;
+        .card h2 {
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            color: var(--text-main);
         }
 
-        .circle-text .label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-top: 8px;
-        }
-
-        .circle-text .range {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 5px;
-        }
-
-        svg {
-            filter: drop-shadow(0 4px 10px rgba(102, 126, 234, 0.2));
-        }
-
-        /* Mini Circles */
-        .mini-circles {
+        .input-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            width: 100%;
-        }
-
-        .mini-circle-card {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 15px;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .mini-circle-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
-        }
-
-        .mini-circle-card .label {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        .mini-circle-card .number {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--text-primary);
-            margin-bottom: 5px;
-        }
-
-        .mini-circle-card .unit {
-            font-size: 10px;
-            color: var(--text-secondary);
-        }
-
-        /* Input Section */
-        .input-section {
-            width: 100%;
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .input-section h3 {
-            color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 15px;
-        }
-
-        .input-group {
-            display: flex;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
             margin-bottom: 12px;
         }
 
-        .input-group.full {
-            flex-direction: column;
+        .full-col {
+            grid-column: span 2;
         }
 
-        input[type="text"],
-        input[type="number"],
-        select {
-            flex: 1;
-            padding: 12px 15px;
-            background: var(--bg-input);
-            border: 2px solid var(--border);
-            color: var(--text-primary);
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.3s;
-        }
-
-        input[type="text"]::placeholder,
-        input[type="number"]::placeholder {
-            color: var(--text-secondary);
-        }
-
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        select:focus {
+        input {
+            width: 100%;
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: var(--text-main);
+            font-size: 0.88rem;
             outline: none;
-            border-color: var(--primary);
-            background: var(--bg-input);
-            box-shadow: 0 0 15px rgba(102, 126, 234, 0.2);
         }
 
-        .btn {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
+        input:focus {
+            border-color: var(--primary);
+        }
+
+        button.btn-primary {
+            width: 100%;
+            background-color: var(--accent);
+            color: #fff;
             border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 14px;
-            font-family: inherit;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger), #ff5252);
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.2);
-        }
-
-        /* Meals List */
-        .meals-list {
-            margin-top: 25px;
-        }
-
-        .meals-list h3 {
-            color: var(--primary);
-            margin-bottom: 15px;
-            font-size: 15px;
-        }
-
-        .meal-item {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 12px;
             padding: 12px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .meal-item:hover {
-            border-color: var(--primary);
-            transform: translateX(-5px);
-        }
-
-        .meal-info {
-            flex: 1;
-        }
-
-        .meal-name {
+            border-radius: 8px;
             font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 5px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: opacity 0.2s;
         }
 
-        .meal-macros {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 4px;
+        button.btn-primary:active {
+            opacity: 0.8;
         }
 
-        .meal-calories {
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            min-width: 60px;
-            text-align: center;
-            font-size: 16px;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-        }
-
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        /* ===== TAB 2: التمارين ===== */
-        .exercises-section {
+        /* قائمة الوجبات */
+        .items-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 8px;
         }
 
-        .exercise-item {
-            background: var(--bg-card);
-            border: 3px solid var(--border);
-            border-radius: 12px;
-            padding: 15px;
+        .meal-row {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
         }
 
-        .exercise-item:hover {
-            transform: translateX(-5px);
-        }
-
-        .exercise-item.completed {
-            border-color: var(--success);
-            background: rgba(81, 207, 102, 0.05);
-        }
-
-        .exercise-info {
-            flex: 1;
-        }
-
-        .exercise-day {
-            font-weight: 700;
-            color: var(--text-primary);
-            font-size: 15px;
-        }
-
-        .exercise-type {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 4px;
-        }
-
-        .checkbox {
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--border);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 24px;
-            background: var(--bg-input);
-            flex-shrink: 0;
-        }
-
-        .exercise-item.completed .checkbox {
-            border-color: var(--success);
-            background: var(--success);
-            color: white;
-        }
-
-        .checkbox:active {
-            transform: scale(0.9);
-        }
-
-        .exercise-stats {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .exercise-stats h3 {
-            color: var(--primary);
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .stats-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        .stat-item {
-            background: var(--bg-input);
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            border-left: 4px solid var(--primary);
-        }
-
-        .stat-number {
-            font-size: 24px;
-            font-weight: 900;
-            color: var(--primary);
+        .meal-info strong {
+            font-size: 0.9rem;
             display: block;
         }
 
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 5px;
+        .meal-info span {
+            font-size: 0.72rem;
+            color: var(--text-sub);
         }
 
-        /* ===== TAB 3: المراجعة الأسبوعية ===== */
-        .review-section {
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 1.1rem;
+            padding: 4px;
+            cursor: pointer;
+        }
+
+        /* التمارين */
+        .workout-list {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 10px;
         }
 
-        .weight-input-card {
-            background: var(--bg-card);
-            border: 2px solid var(--border);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba
+        .workout-item {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .workout-item .meta strong {
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .workout-item .meta span {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background-color: var(--bg-input);
+            color: var(--text-sub);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-action.success-active {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .btn-action.fail-active {
+            background-color: var(--danger);
+            border-color: var(--danger);
+            color: #fff;
+        }
+
+        .summary-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .stat-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-card .val {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .stat-card .desc {
+            font-size: 0.75rem;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+
+        /* المراجعة الأسبوعية */
+        .alert-friday {
+            background-color: rgba(210, 153, 34, 0.15);
+            border: 1px solid var(--warning);
+            color: var(--warning);
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        .weight-history-item {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .weight-history-item .date {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+        }
+
+        .weight-history-item .val {
+            font-weight: 700;
+        }
+
+        .weight-history-item .diff {
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .diff.gain { color: var(--danger); }
+        .diff.loss { color: var(--accent); }
+        .diff.same { color: var(--text-sub); }
+
+        /* شريط التنقل السفلي */
+        nav.tab-bar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            height: 68px;
+            background-color: rgba(22, 27, 34, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 20;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--text-sub);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            width: 33%;
+        }
+
+        .nav-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .nav-btn.active {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .nav-btn.active svg {
+            stroke: var(--primary);
+        }
+    </style>
+</head>
+<body>
+
+<div class="mobile-container">
+    <header>
+        <h1 id="headerTitle">تتبع السعرات اليومية</h1>
+    </header>
+
+    <div class="content">
+        <!-- 1. شاشة السعرات -->
+        <section id="tab-calories" class="tab-view active">
+            <div class="circle-dashboard">
+                <div class="main-ring">
+                    <svg width="190" height="190">
+                        <circle cx="95" cy="95" r="80" stroke="#21262d" stroke-width="12" fill="none"></circle>
+                        <circle id="calCircle" cx="95" cy="95" r="80" stroke="var(--c-cal)" stroke-width="12" fill="none"
+                                stroke-dasharray="502.6" stroke-dashoffset="502.6" stroke-linecap="round"></circle>
+                    </svg>
+                    <div class="main-ring-center">
+                        <div class="value" id="calCurrent">0</div>
+                        <div class="label">سعرة مستهلكة</div>
+                        <div class="target">الهدف: 1950 (1900-2000)</div>
+                    </div>
+                </div>
+
+                <div class="mini-macros-row">
+                    <div class="macro-card">
+                        <div class="name">البروتين (الأساس)</div>
+                        <div class="mini-ring">
+                            <svg width="58" height="58">
+                                <circle cx="29" cy="29" r="23" stroke="#21262d" stroke-width="5" fill="none"></circle>
+                                <circle id="proCircle" cx="29" cy="29" r="23" stroke="var(--c-pro)" stroke-width="5" fill="none"
+                                        stroke-dasharray="144.5" stroke-dashoffset="144.5" stroke-linecap="round"></circle>
+                            </svg>
+                            <div class="mini-ring-center" id="proText">0</div>
+                        </div>
+                        <div class="val">الهدف: 160g</div>
+                    </div>
+
+                    <div class="macro-card">
+                        <div class="name">الكاربوهيدرات</div>
+                        <div class="mini-ring">
+                            <svg width="58" height="58">
+                                <circle cx="29" cy="29" r="23" stroke="#21262d" stroke-width="5" fill="none"></circle>
+                                <circle id="carbCircle" cx="29" cy="29" r="23" stroke="var(--c-carb)" stroke-width="5" fill="none"
+                                        stroke-dasharray="144.5" stroke-dashoffset="144.5" stroke-linecap="round"></circle>
+                            </svg>
+                            <div class="mini-ring-center" id="carbText">0</div>
+                        </div>
+                        <div class="val">الهدف: 200g</div>
+                    </div>
+
+                    <div class="macro-card">
+                        <div class="name">الدهون الصحية</div>
+                        <div class="mini-ring">
+                            <svg width="58" height="58">
+                                <circle cx="29" cy="29" r="23" stroke="#21262d" stroke-width="5" fill="none"></circle>
+                                <circle id="fatCircle" cx="29" cy="29" r="23" stroke="var(--c-fat)" stroke-width="5" fill="none"
+                                        stroke-dasharray="144.5" stroke-dashoffset="144.5" stroke-linecap="round"></circle>
+                            </svg>
+                            <div class="mini-ring-center" id="fatText">0</div>
+                        </div>
+                        <div class="val">الهدف: 55g</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>إضافة وجبة</h2>
+                <div class="input-grid">
+                    <div class="full-col">
+                        <input type="text" id="mealName" placeholder="اسم الوجبة (مثال: فطور، دجاج مع رز)">
+                    </div>
+                    <div>
+                        <input type="number" id="mealCal" placeholder="السعرات (kcal)">
+                    </div>
+                    <div>
+                        <input type="number" id="mealPro" placeholder="بروتين (g)">
+                    </div>
+                    <div>
+                        <input type="number" id="mealCarb" placeholder="كارب (g)">
+                    </div>
+                    <div>
+                        <input type="number" id="mealFat" placeholder="دهون (g)">
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="addMeal()">+ تسجيل الوجبة</button>
+            </div>
+
+            <div class="card">
+                <h2>وجبات اليوم (توقيت البحرين)</h2>
+                <div class="items-list" id="mealsList"></div>
+            </div>
+        </section>
+
+        <!-- 2. شاشة التمارين -->
+        <section id="tab-workouts" class="tab-view">
+            <div class="card">
+                <h2>جدول الأسبوع</h2>
+                <div class="workout-list" id="workoutList"></div>
+            </div>
+
+            <div class="card">
+                <h2>حصاد الأسبوع (كل جمعة)</h2>
+                <div class="summary-box">
+                    <div class="stat-card">
+                        <div class="val" style="color: var(--accent);" id="doneCount">0</div>
+                        <div class="desc">أيام تدرّبت فيها</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="val" style="color: var(--danger);" id="missCount">0</div>
+                        <div class="desc">أيام تخلفت عنها</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. شاشة المراجعة الأسبوعية -->
+        <section id="tab-review" class="tab-view">
+            <div id="fridayNotice" class="alert-friday" style="display: none;">
+                اليوم الجمعة بتوقيت البحرين. حان موعد تسجيل وزنك الأسبوعي لمعاينة مستوى تقدمك.
+            </div>
+
+            <div class="card">
+                <h2>تسجيل الوزن الأسبوعي</h2>
+                <div class="input-grid">
+                    <div class="full-col">
+                        <input type="number" step="0.1" id="weightInput" placeholder="أدخل الوزن بالكيلوغرام (مثال: 72.5)">
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="addWeightRecord()">حفظ وزن اليوم</button>
+            </div>
+
+            <div class="card">
+                <h2>سجل قياسات الوزن وتغيراتها</h2>
+                <div class="items-list" id="weightHistory"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- شريط التنقل السفلي -->
+    <nav class="tab-bar">
+        <button class="nav-btn active" onclick="switchTab('calories', this)">
+            <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+            السعرات
+        </button>
+        <button class="nav-btn" onclick="switchTab('workouts', this)">
+            <svg viewBox="0 0 24 24"><path d="M6 16V8m12 8V8M3 14v-4m18 4v-4M8 12h8"></path></svg>
+            التمارين
+        </button>
+        <button class="nav-btn" onclick="switchTab('review', this)">
+            <svg viewBox="0 0 24 24"><path d="M20 12V8H4v12h9M16 2v4M8 2v4m-4 6h16m2 7l2 2 4-4"></path></svg>
+            مراجعة الجمعة
+        </button>
+    </nav>
+</div>
+
+<script>
+    // أهداف المغذيات
+    const TARGETS = { cal: 1950, pro: 160, carb: 200, fat: 55 };
+
+    // جدول التمارين المخصص
+    const SCHEDULE = [
+        { id: 0, day: 'الأحد', muscle: 'أكتاف' },
+        { id: 1, day: 'الإثنين', muscle: 'كارديو وبطن' },
+        { id: 2, day: 'الثلاثاء', muscle: 'باي وتراي وسواعد' },
+        { id: 3, day: 'الأربعاء', muscle: 'ظهر' },
+        { id: 4, day: 'الخميس', muscle: 'صدر' },
+        { id: 5, day: 'الجمعة', muscle: 'راحة ومراجعة أسبوعية' },
+        { id: 6, day: 'السبت', muscle: 'فخذ' }
+    ];
+
+    // جلب التاريخ والوقت بتوقيت البحرين (UTC+3)
+    function getBahrainDate() {
+        const d = new Date();
+        const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+        return new Date(utc + (3600000 * 3));
+    }
+
+    function getTodayKey() {
+        const b = getBahrainDate();
+        return `${b.getFullYear()}-${String(b.getMonth()+1).padStart(2,'0')}-${String(b.getDate()).padStart(2,'0')}`;
+    }
+
+    function getWeekKey() {
+        const b = getBahrainDate();
+        const startOfYear = new Date(b.getFullYear(), 0, 1);
+        const pastDays = (b - startOfYear) / 86400000;
+        return `${b.getFullYear()}-W${Math.ceil((pastDays + startOfYear.getDay() + 1) / 7)}`;
+    }
+
+    // التنقل بين الأقسام
+    function switchTab(tabKey, btn) {
+        document.querySelectorAll('.tab-view').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        
+        document.getElementById(`tab-${tabKey}`).classList.add('active');
+        btn.classList.add('active');
+
+        const titles = {
+            calories: 'تتبع السعرات اليومية',
+            workouts: 'جدول وإحصائيات التمارين',
+            review: 'المراجعة الأسبوعية للوزن'
+        };
+        document.getElementById('headerTitle').innerText = titles[tabKey];
+    }
+
+    /* ===== قسم السعرات والوجبات ===== */
+    function getMeals() {
+        const key = `meals_${getTodayKey()}`;
+        return JSON.parse(localStorage.getItem(key) || '[]');
+    }
+
+    function saveMeals(arr) {
+        localStorage.setItem(`meals_${getTodayKey()}`, JSON.stringify(arr));
+        renderCalories();
+    }
+
+    function addMeal() {
+        const name = document.getElementById('mealName').value.trim() || 'وجبة خفيفة';
+        const cal = parseFloat(document.getElementById('mealCal').value) || 0;
+        const pro = parseFloat(document.getElementById('mealPro').value) || 0;
+        const carb = parseFloat(document.getElementById('mealCarb').value) || 0;
+        const fat = parseFloat(document.getElementById('mealFat').value) || 0;
+
+        if (cal === 0 && pro === 0 && carb === 0 && fat === 0) return;
+
+        const meals = getMeals();
+        meals.push({ id: Date.now(), name, cal, pro, carb, fat });
+        saveMeals(meals);
+
+        document.getElementById('mealName').value = '';
+        document.getElementById('mealCal').value = '';
+        document.getElementById('mealPro').value = '';
+        document.getElementById('mealCarb').value = '';
+        document.getElementById('mealFat').value = '';
+    }
+
+    function deleteMeal(id) {
+        let meals = getMeals();
+        meals = meals.filter(m => m.id !== id);
+        saveMeals(meals);
+    }
+
+    function updateCircle(id, current, max, circumference) {
+        const circle = document.getElementById(id);
+        const percent = Math.min(current / max, 1);
+        const offset = circumference - (percent * circumference);
+        circle.style.strokeDashoffset = offset;
+    }
+
+    function renderCalories() {
+        const meals = getMeals();
+        const totals = meals.reduce((acc, m) => {
+            acc.cal += m.cal;
+            acc.pro += m.pro;
+            acc.carb += m.carb;
+            acc.fat += m.fat;
+            return acc;
+        }, { cal: 0, pro: 0, carb: 0, fat: 0 });
+
+        // تحديث الأرقام والدوائر
+        document.getElementById('calCurrent').innerText = Math.round(totals.cal);
+        updateCircle('calCircle', totals.cal, TARGETS.cal, 502.6);
+
+        document.getElementById('proText').innerText = `${Math.round(totals.pro)}g`;
+        updateCircle('proCircle', totals.pro, TARGETS.pro, 144.5);
+
+        document.getElementById('carbText').innerText = `${Math.round(totals.carb)}g`;
+        updateCircle('carbCircle', totals.carb, TARGETS.carb, 144.5);
+
+        document.getElementById('fatText').innerText = `${Math.round(totals.fat)}g`;
+        updateCircle('fatCircle', totals.fat, TARGETS.fat, 144.5);
+
+        // قائمة الوجبات
+        const listEl = document.getElementById('mealsList');
+        if (meals.length === 0) {
+            listEl.innerHTML = '<div style="color: var(--text-sub); text-align: center; padding: 15px;">لم تسجل أي وجبة اليوم</div>';
+            return;
+        }
+
+        listEl.innerHTML = meals.map(m => `
+            <div class="meal-row">
+                <div class="meal-info">
+                    <strong>${m.name} - ${m.cal} سعرة</strong>
+                    <span>بروتين: ${m.pro}g | كارب: ${m.carb}g | دهون: ${m.fat}g</span>
+                </div>
+                <button class="btn-delete" onclick="deleteMeal(${m.id})">✕</button>
+            </div>
+        `).reverse().join('');
+    }
+
+    /* ===== قسم التمارين ===== */
+    function getWorkoutsState() {
+        const key = `workout_${getWeekKey()}`;
+        return JSON.parse(localStorage.getItem(key) || '{}');
+    }
+
+    function setWorkoutStatus(dayId, status) {
+        const state = getWorkoutsState();
+        if (state[dayId] === status) {
+            delete state[dayId];
+        } else {
+            state[dayId] = status;
+        }
+        localStorage.setItem(`workout_${getWeekKey()}`, JSON.stringify(state));
+        renderWorkouts();
+    }
+
+    function renderWorkouts() {
+        const state = getWorkoutsState();
+        const listEl = document.getElementById('workoutList');
+        let done = 0;
+        let missed = 0;
+
+        listEl.innerHTML = SCHEDULE.map(item => {
+            const status = state[item.id];
+            if (status === 'done') done++;
+            if (status === 'missed') missed++;
+
+            return `
+                <div class="workout-item">
+                    <div class="meta">
+                        <strong>${item.day}</strong>
+                        <span>${item.muscle}</span>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn-action ${status === 'done' ? 'success-active' : ''}" 
+                                onclick="setWorkoutStatus(${item.id}, 'done')">✓</button>
+                        <button class="btn-action ${status === 'missed' ? 'fail-active' : ''}" 
+                                onclick="setWorkoutStatus(${item.id}, 'missed')">✕</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('doneCount').innerText = done;
+        document.getElementById('missCount').innerText = missed;
+    }
+
+    /* ===== قسم المراجعة الأسبوعية للوزن ===== */
+    function getWeights() {
+        return JSON.parse(localStorage.getItem('weight_history') || '[]');
+    }
+
+    function addWeightRecord() {
+        const input = document.getElementById('weightInput');
+        const val = parseFloat(input.value);
+        if (!val) return;
+
+        const weights = getWeights();
+        const dateStr = getBahrainDate().toLocaleDateString('ar-BH', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+
+        weights.unshift({ id: Date.now(), weight: val, date: dateStr, rawDate: getBahrainDate().toISOString() });
+        localStorage.setItem('weight_history', JSON.stringify(weights));
+
+        input.value = '';
+        renderWeightReview();
+    }
+
+    function renderWeightReview() {
+        const isFriday = getBahrainDate().getDay() === 5;
+        document.getElementById('fridayNotice').style.display = isFriday ? 'block' : 'none';
+
+        const weights = getWeights();
+        const listEl = document.getElementById('weightHistory');
+
+        if (weights.length === 0) {
+            listEl.innerHTML = '<div style="color: var(--text-sub); text-align: center; padding: 15px;">لا توجد أوزان مسجلة حتى الآن</div>';
+            return;
+        }
+
+        listEl.innerHTML = weights.map((w, index) => {
+            let diffHtml = '<span class="diff same">البداية</span>';
+            if (index < weights.length - 1) {
+                const prev = weights[index + 1].weight;
+                const change = (w.weight - prev).toFixed(2);
+                if (change > 0) {
+                    diffHtml = `<span class="diff gain">+${change} كغ</span>`;
+                } else if (change < 0) {
+                    diffHtml = `<span class="diff loss">${change} كغ</span>`;
+                } else {
+                    diffHtml = `<span class="diff same">0.0 كغ</span>`;
+                }
+            }
+
+            return `
+                <div class="weight-history-item">
+                    <div>
+                        <div class="val">${w.weight} كغ</div>
+                        <div class="date">${w.date}</div>
+                    </div>
+                    <div>${diffHtml}</div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // التشغيل المبدئي
+    renderCalories();
+    renderWorkouts();
+    renderWeightReview();
+</script>
+</body>
+</html>
